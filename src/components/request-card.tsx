@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { categories } from "@/lib/categories";
 import { formatBudget, formatNeededAt, formatRelativeTime } from "@/lib/format";
 
@@ -19,7 +20,10 @@ export function RequestCard({ request }: { request: RequestListItem }) {
   const budget = formatBudget(request.budget_amount, request.budget_currency);
 
   return (
-    <div className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <Link
+      href={`/anfrage/${request.id}`}
+      className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
+    >
       <div className="flex items-start justify-between gap-2">
         <h3 className="text-lg font-semibold text-slate-900">
           {category?.emoji} {request.title}
@@ -45,15 +49,10 @@ export function RequestCard({ request }: { request: RequestListItem }) {
         <span className="text-xs text-slate-400">
           {formatRelativeTime(request.created_at)}
         </span>
-        <button
-          type="button"
-          disabled
-          title="Kommt in Phase 7"
-          className="cursor-not-allowed rounded-full bg-brand/40 px-4 py-2 text-sm font-semibold text-white"
-        >
+        <span className="rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white">
           Ich kann helfen
-        </button>
+        </span>
       </div>
-    </div>
+    </Link>
   );
 }
