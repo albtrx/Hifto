@@ -28,7 +28,7 @@ Marktplatz für akute Bedürfnisse: Nutzer beschreiben, was sie gerade brauchen 
 - [x] Phase 8 — Messaging
 - [x] Phase 9 — Profile & Bewertungen
 - [x] Phase 10 — Benachrichtigungen
-- [ ] Phase 11 — Moderation & Sicherheit
+- [x] Phase 11 — Moderation & Sicherheit
 - [ ] Phase 12 — Mobile Optimierung
 
 ## Lokale Entwicklung
