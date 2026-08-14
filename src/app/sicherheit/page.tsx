@@ -5,7 +5,7 @@ export default function SafetyPage() {
         Sicherheit &amp; Regeln
       </h1>
       <p className="mt-4 text-slate-600">
-        NeedIt bringt Menschen zusammen, die sich vorher meist nicht kennen.
+        Hifto bringt Menschen zusammen, die sich vorher meist nicht kennen.
         Damit das gut funktioniert, gelten ein paar einfache Regeln.
       </p>
 
@@ -50,7 +50,7 @@ export default function SafetyPage() {
           </h2>
           <p className="mt-1 text-slate-600">
             Triff dich nach Möglichkeit an belebten, öffentlichen Orten und
-            gib niemals Zahlungen im Voraus, ohne die Person zu kennen. NeedIt
+            gib niemals Zahlungen im Voraus, ohne die Person zu kennen. Hifto
             ist eine Vermittlungsplattform und keine Vertragspartei zwischen
             Nutzern.
           </p>

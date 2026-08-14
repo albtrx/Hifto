@@ -15,9 +15,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "NeedIt – Frag die Leute in deiner Nähe",
+  title: "Hifto – Frag die Leute in deiner Nähe",
   description:
-    "NeedIt ist der Marktplatz für akute Bedürfnisse. Beschreibe, was du brauchst, und finde Menschen in deiner Nähe, die dir helfen können.",
+    "Hifto ist der Marktplatz für akute Bedürfnisse. Beschreibe, was du brauchst, und finde Menschen in deiner Nähe, die dir helfen können.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

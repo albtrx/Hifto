@@ -30,7 +30,7 @@ export async function SiteHeader() {
           href="/"
           className="text-xl font-bold tracking-tight text-slate-900"
         >
-          Need<span className="text-brand">It</span>
+          Hif<span className="text-brand">to</span>
         </Link>
 
         <nav className="hidden items-center gap-8 sm:flex">

@@ -1,4 +1,4 @@
-# NeedIt
+# Hifto
 
 Marktplatz für akute Bedürfnisse: Nutzer beschreiben, was sie gerade brauchen ("Ich brauche heute jemanden, der mir beim Umzug hilft"), andere Nutzer bieten Hilfe an.
 
