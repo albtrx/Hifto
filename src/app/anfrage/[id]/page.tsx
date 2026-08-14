@@ -95,6 +95,16 @@ export default async function RequestDetailPage({
   }
   const revieweeId = isOwner ? request.helper_id : request.user_id;
 
+  let ownerName: string | null = null;
+  if (!isOwner) {
+    const { data: ownerProfile } = await supabase
+      .from("profiles")
+      .select("full_name")
+      .eq("id", request.user_id)
+      .single();
+    ownerName = ownerProfile?.full_name ?? null;
+  }
+
   return (
     <div className="mx-auto w-full max-w-2xl px-4 py-12 sm:px-6">
       <Link
@@ -121,6 +131,25 @@ export default async function RequestDetailPage({
           )}
         </div>
       </div>
+
+      {!isOwner && (
+        <div className="mt-2 flex items-center gap-3 text-sm">
+          <Link
+            href={`/profil/${request.user_id}`}
+            className="text-slate-500 hover:text-brand"
+          >
+            von {ownerName ?? "Ein Nutzer"}
+          </Link>
+          {user && (
+            <Link
+              href={`/melden?requestId=${id}`}
+              className="text-slate-400 hover:text-red-600"
+            >
+              Melden
+            </Link>
+          )}
+        </div>
+      )}
 
       {request.image_url && (
         // eslint-disable-next-line @next/next/no-img-element

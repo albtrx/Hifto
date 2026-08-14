@@ -9,13 +9,18 @@ export async function SiteHeader() {
   } = await supabase.auth.getUser();
 
   let unreadCount = 0;
+  let isAdmin = false;
   if (user) {
-    const { count } = await supabase
-      .from("notifications")
-      .select("id", { count: "exact", head: true })
-      .eq("user_id", user.id)
-      .eq("is_read", false);
+    const [{ count }, { data: profile }] = await Promise.all([
+      supabase
+        .from("notifications")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", user.id)
+        .eq("is_read", false),
+      supabase.from("profiles").select("is_admin").eq("id", user.id).single(),
+    ]);
     unreadCount = count ?? 0;
+    isAdmin = profile?.is_admin ?? false;
   }
 
   return (
@@ -69,6 +74,14 @@ export async function SiteHeader() {
               >
                 Profil
               </Link>
+              {isAdmin && (
+                <Link
+                  href="/admin"
+                  className="hidden text-sm font-medium text-slate-600 hover:text-brand sm:inline"
+                >
+                  Admin
+                </Link>
+              )}
               <form action={logout}>
                 <button
                   type="submit"

@@ -25,7 +25,28 @@ export async function updateSession(request: NextRequest) {
     },
   );
 
-  await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (user && !request.nextUrl.pathname.startsWith("/gesperrt")) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("is_banned")
+      .eq("id", user.id)
+      .single();
+
+    if (profile?.is_banned) {
+      await supabase.auth.signOut();
+      const redirectResponse = NextResponse.redirect(
+        new URL("/gesperrt", request.url),
+      );
+      supabaseResponse.cookies.getAll().forEach((cookie) => {
+        redirectResponse.cookies.set(cookie);
+      });
+      return redirectResponse;
+    }
+  }
 
   return supabaseResponse;
 }

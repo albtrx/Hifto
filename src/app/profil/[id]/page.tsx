@@ -1,13 +1,17 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { blockUser, unblockUser } from "./actions";
 
 export default async function ProfilePage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ blockiert?: string; gemeldet?: string }>;
 }) {
   const { id } = await params;
+  const { blockiert, gemeldet } = await searchParams;
 
   const supabase = await createClient();
   const { data: profile } = await supabase
@@ -22,6 +26,17 @@ export default async function ProfilePage({
     data: { user },
   } = await supabase.auth.getUser();
   const isOwnProfile = user?.id === id;
+
+  let isBlocked = false;
+  if (user && !isOwnProfile) {
+    const { data: block } = await supabase
+      .from("blocks")
+      .select("id")
+      .eq("blocker_id", user.id)
+      .eq("blocked_id", id)
+      .maybeSingle();
+    isBlocked = Boolean(block);
+  }
 
   const [{ data: reviews }, { count: successfulHelps }] = await Promise.all([
     supabase.from("reviews").select("rating").eq("reviewee_id", id),
@@ -93,13 +108,52 @@ export default async function ProfilePage({
         </div>
       </div>
 
-      {isOwnProfile && (
-        <Link
-          href="/profil/bearbeiten"
-          className="mt-6 inline-flex h-11 items-center justify-center rounded-full border border-slate-300 px-6 text-sm font-semibold text-slate-700 transition-colors hover:border-brand hover:text-brand"
-        >
-          Profil bearbeiten
-        </Link>
+      {gemeldet === "1" && (
+        <p className="mt-6 rounded-lg bg-green-50 px-4 py-2 text-sm text-green-700">
+          Danke, deine Meldung wurde übermittelt.
+        </p>
+      )}
+      {blockiert === "1" && (
+        <p className="mt-6 rounded-lg bg-green-50 px-4 py-2 text-sm text-green-700">
+          Nutzer blockiert.
+        </p>
+      )}
+
+      {isOwnProfile ? (
+        <div className="mt-6 flex flex-wrap gap-3">
+          <Link
+            href="/profil/bearbeiten"
+            className="inline-flex h-11 items-center justify-center rounded-full border border-slate-300 px-6 text-sm font-semibold text-slate-700 transition-colors hover:border-brand hover:text-brand"
+          >
+            Profil bearbeiten
+          </Link>
+          <Link
+            href="/profil/blockiert"
+            className="inline-flex h-11 items-center justify-center rounded-full border border-slate-300 px-6 text-sm font-semibold text-slate-700 transition-colors hover:border-brand hover:text-brand"
+          >
+            Blockierte Nutzer
+          </Link>
+        </div>
+      ) : (
+        user && (
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link
+              href={`/melden?userId=${id}`}
+              className="inline-flex h-11 items-center justify-center rounded-full border border-slate-300 px-6 text-sm font-semibold text-slate-700 transition-colors hover:border-red-400 hover:text-red-600"
+            >
+              Melden
+            </Link>
+            <form action={isBlocked ? unblockUser : blockUser}>
+              <input type="hidden" name="userId" value={id} />
+              <button
+                type="submit"
+                className="inline-flex h-11 items-center justify-center rounded-full border border-slate-300 px-6 text-sm font-semibold text-slate-700 transition-colors hover:border-red-400 hover:text-red-600"
+              >
+                {isBlocked ? "Entblocken" : "Blockieren"}
+              </button>
+            </form>
+          </div>
+        )
       )}
     </div>
   );

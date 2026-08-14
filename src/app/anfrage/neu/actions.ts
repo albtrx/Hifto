@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { categories } from "@/lib/categories";
+import { isRateLimited } from "@/lib/rate-limit";
 
 export async function createRequest(formData: FormData) {
   const supabase = await createClient();
@@ -12,6 +13,12 @@ export async function createRequest(formData: FormData) {
 
   if (!user) {
     redirect("/login");
+  }
+
+  if (await isRateLimited(supabase, "requests", "user_id", user.id, 10)) {
+    redirect(
+      `/anfrage/neu?error=${encodeURIComponent("Du hast heute schon zu viele Anfragen erstellt. Versuch es morgen wieder.")}`,
+    );
   }
 
   const title = (formData.get("title") as string)?.trim();

@@ -4,6 +4,7 @@ import { formatBudget, formatNeededAt, formatRelativeTime } from "@/lib/format";
 
 export type RequestListItem = {
   id: string;
+  user_id: string;
   title: string;
   description: string;
   category: string;

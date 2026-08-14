@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { isRateLimited } from "@/lib/rate-limit";
 
 export async function respondToRequest(formData: FormData) {
   const supabase = await createClient();
@@ -14,6 +15,12 @@ export async function respondToRequest(formData: FormData) {
 
   if (!user) {
     redirect(`/login?next=${encodeURIComponent(`/anfrage/${requestId}`)}`);
+  }
+
+  if (await isRateLimited(supabase, "responses", "responder_id", user.id, 30)) {
+    redirect(
+      `/anfrage/${requestId}?error=${encodeURIComponent("Du hast heute schon zu viele Antworten geschickt. Versuch es morgen wieder.")}`,
+    );
   }
 
   if (!message) {

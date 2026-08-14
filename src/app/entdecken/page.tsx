@@ -25,6 +25,7 @@ export default async function DiscoverPage({
     .from("requests")
     .select("*")
     .eq("status", "open")
+    .eq("is_hidden", false)
     .order("created_at", { ascending: false });
 
   if (kategorie) query = query.eq("category", kategorie);
@@ -42,7 +43,22 @@ export default async function DiscoverPage({
   }
 
   const { data: requests } = await query;
-  const list = (requests ?? []) as RequestListItem[];
+  let list = (requests ?? []) as RequestListItem[];
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (user) {
+    const { data: blocks } = await supabase
+      .from("blocks")
+      .select("blocked_id")
+      .eq("blocker_id", user.id);
+    const blockedIds = new Set((blocks ?? []).map((b) => b.blocked_id));
+    if (blockedIds.size > 0) {
+      list = list.filter((r) => !blockedIds.has(r.user_id));
+    }
+  }
   const hasActiveFilters = Boolean(kategorie || heute || budget || dringend);
 
   return (

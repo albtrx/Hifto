@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { isRateLimited } from "@/lib/rate-limit";
 
 export async function sendMessage(formData: FormData) {
   const supabase = await createClient();
@@ -19,7 +20,15 @@ export async function sendMessage(formData: FormData) {
     );
   }
 
-  if (body) {
+  const tooManyMessages = await isRateLimited(
+    supabase,
+    "messages",
+    "sender_id",
+    user.id,
+    100,
+  );
+
+  if (body && !tooManyMessages) {
     const { error } = await supabase.from("messages").insert({
       request_id: requestId,
       responder_id: responderId,
