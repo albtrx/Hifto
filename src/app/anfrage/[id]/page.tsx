@@ -362,7 +362,7 @@ export default async function RequestDetailPage({
                     </select>
                   </label>
 
-                  <div className="grid grid-cols-3 gap-3">
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                     <RatingField name="reliability" label="Zuverlässigkeit" />
                     <RatingField name="friendliness" label="Freundlichkeit" />
                     <RatingField name="quality" label="Qualität" />

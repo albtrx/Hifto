@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { blockUser, unblockUser } from "./actions";
+import { logout } from "@/app/login/actions";
 
 export default async function ProfilePage({
   params,
@@ -133,6 +134,14 @@ export default async function ProfilePage({
           >
             Blockierte Nutzer
           </Link>
+          <form action={logout} className="sm:hidden">
+            <button
+              type="submit"
+              className="inline-flex h-11 items-center justify-center rounded-full border border-slate-300 px-6 text-sm font-semibold text-slate-700 transition-colors hover:border-red-400 hover:text-red-600"
+            >
+              Ausloggen
+            </button>
+          </form>
         </div>
       ) : (
         user && (

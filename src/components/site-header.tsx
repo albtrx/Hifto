@@ -33,7 +33,7 @@ export async function SiteHeader() {
           Hif<span className="text-brand">to</span>
         </Link>
 
-        <nav className="hidden items-center gap-8 sm:flex">
+        <nav className="hidden items-center gap-8 lg:flex">
           <Link
             href="/entdecken"
             className="text-sm font-medium text-slate-600 hover:text-brand"
@@ -70,19 +70,19 @@ export async function SiteHeader() {
               </Link>
               <Link
                 href={`/profil/${user.id}`}
-                className="hidden text-sm font-medium text-slate-600 hover:text-brand sm:inline"
+                className="hidden text-sm font-medium text-slate-600 hover:text-brand lg:inline"
               >
                 Profil
               </Link>
               {isAdmin && (
                 <Link
                   href="/admin"
-                  className="hidden text-sm font-medium text-slate-600 hover:text-brand sm:inline"
+                  className="hidden text-sm font-medium text-slate-600 hover:text-brand lg:inline"
                 >
                   Admin
                 </Link>
               )}
-              <form action={logout}>
+              <form action={logout} className="hidden lg:block">
                 <button
                   type="submit"
                   className="text-sm font-medium text-slate-600 hover:text-brand"
@@ -94,14 +94,14 @@ export async function SiteHeader() {
           ) : (
             <Link
               href="/login"
-              className="hidden text-sm font-medium text-slate-600 hover:text-brand sm:inline"
+              className="hidden text-sm font-medium text-slate-600 hover:text-brand lg:inline"
             >
               Einloggen
             </Link>
           )}
           <Link
             href="/anfrage/neu"
-            className="rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-dark"
+            className="hidden rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-dark lg:inline-block"
           >
             Anfrage erstellen
           </Link>
