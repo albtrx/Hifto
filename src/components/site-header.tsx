@@ -8,6 +8,16 @@ export async function SiteHeader() {
     data: { user },
   } = await supabase.auth.getUser();
 
+  let unreadCount = 0;
+  if (user) {
+    const { count } = await supabase
+      .from("notifications")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .eq("is_read", false);
+    unreadCount = count ?? 0;
+  }
+
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/80 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
@@ -41,6 +51,18 @@ export async function SiteHeader() {
         <div className="flex items-center gap-3">
           {user ? (
             <>
+              <Link
+                href="/benachrichtigungen"
+                className="relative text-lg text-slate-600 hover:text-brand"
+                aria-label="Benachrichtigungen"
+              >
+                🔔
+                {unreadCount > 0 && (
+                  <span className="absolute -right-1.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
+                    {unreadCount}
+                  </span>
+                )}
+              </Link>
               <Link
                 href={`/profil/${user.id}`}
                 className="hidden text-sm font-medium text-slate-600 hover:text-brand sm:inline"
