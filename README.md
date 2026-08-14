@@ -19,10 +19,10 @@ Marktplatz für akute Bedürfnisse: Nutzer beschreiben, was sie gerade brauchen 
 ## MVP-Roadmap
 
 - [x] Phase 1 — Projekt erstellen & Entwicklungsumgebung einrichten
-- [ ] Phase 2 — Homepage & Design
-- [ ] Phase 3 — Supabase einrichten
-- [ ] Phase 4 — Registrierung & Login
-- [ ] Phase 5 — Anfragen erstellen
+- [x] Phase 2 — Homepage & Design
+- [x] Phase 3 — Supabase einrichten
+- [x] Phase 4 — Registrierung & Login
+- [x] Phase 5 — Anfragen erstellen
 - [ ] Phase 6 — Anfragen anzeigen & filtern
 - [ ] Phase 7 — "Ich kann helfen"
 - [ ] Phase 8 — Messaging
@@ -33,4 +33,7 @@ Marktplatz für akute Bedürfnisse: Nutzer beschreiben, was sie gerade brauchen 
 
 ## Lokale Entwicklung
 
-_Setup-Anleitung folgt, sobald das Next.js-Projekt initialisiert ist._
+1. `npm install`
+2. `.env.example` nach `.env.local` kopieren und mit den eigenen Supabase-Zugangsdaten (Project Settings → API) befüllen
+3. SQL-Migrationen aus `supabase/migrations/` der Reihe nach im Supabase SQL Editor ausführen
+4. `npm run dev` und `http://localhost:3000` öffnen
