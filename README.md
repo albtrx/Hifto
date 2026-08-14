@@ -23,7 +23,7 @@ Marktplatz für akute Bedürfnisse: Nutzer beschreiben, was sie gerade brauchen 
 - [x] Phase 3 — Supabase einrichten
 - [x] Phase 4 — Registrierung & Login
 - [x] Phase 5 — Anfragen erstellen
-- [ ] Phase 6 — Anfragen anzeigen & filtern
+- [x] Phase 6 — Anfragen anzeigen & filtern
 - [ ] Phase 7 — "Ich kann helfen"
 - [ ] Phase 8 — Messaging
 - [ ] Phase 9 — Profile & Bewertungen
