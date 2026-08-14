@@ -72,6 +72,7 @@ export async function createRequest(formData: FormData) {
     .single();
 
   if (error || !newRequest) {
+    console.error("createRequest insert failed:", error);
     redirect(
       `/anfrage/neu?error=${encodeURIComponent("Anfrage konnte nicht gespeichert werden.")}`,
     );

@@ -1,11 +1,6 @@
 -- Vorherigen (evtl. unvollständigen) Stand entfernen, damit das Skript
 -- gefahrlos erneut ausgeführt werden kann
-drop policy if exists "Open requests are viewable by everyone" on public.requests;
-drop policy if exists "Owners can view their own requests" on public.requests;
-drop policy if exists "Authenticated users can create requests" on public.requests;
-drop policy if exists "Owners can update their own requests" on public.requests;
-drop policy if exists "Owners can delete their own requests" on public.requests;
-drop table if exists public.requests;
+drop table if exists public.requests cascade;
 
 create table public.requests (
   id uuid primary key default gen_random_uuid(),
