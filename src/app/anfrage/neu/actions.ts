@@ -22,6 +22,7 @@ export async function createRequest(formData: FormData) {
   const budgetAmountRaw = formData.get("budgetAmount") as string;
   const budgetCurrency = (formData.get("budgetCurrency") as string) || "CHF";
   const image = formData.get("image") as File | null;
+  const isUrgent = formData.get("isUrgent") === "1";
 
   if (!title || !description || !location) {
     redirect(
@@ -67,6 +68,7 @@ export async function createRequest(formData: FormData) {
       budget_amount: budgetAmountRaw ? Number(budgetAmountRaw) : null,
       budget_currency: budgetCurrency,
       image_url: imageUrl,
+      is_urgent: isUrgent,
     })
     .select("id")
     .single();

@@ -2,8 +2,6 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { logout } from "@/app/login/actions";
 
-const navItems = ["Entdecken", "Wie es funktioniert"];
-
 export async function SiteHeader() {
   const supabase = await createClient();
   const {
@@ -21,11 +19,15 @@ export async function SiteHeader() {
         </Link>
 
         <nav className="hidden items-center gap-8 sm:flex">
-          {navItems.map((item) => (
-            <span key={item} className="text-sm font-medium text-slate-600">
-              {item}
-            </span>
-          ))}
+          <Link
+            href="/entdecken"
+            className="text-sm font-medium text-slate-600 hover:text-brand"
+          >
+            Entdecken
+          </Link>
+          <span className="text-sm font-medium text-slate-600">
+            Wie es funktioniert
+          </span>
         </nav>
 
         <div className="flex items-center gap-3">

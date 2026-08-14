@@ -139,6 +139,18 @@ export default async function NewRequestPage({
           />
         </Field>
 
+        <label className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            name="isUrgent"
+            value="1"
+            className="h-4 w-4 rounded border-slate-300 text-brand focus:ring-brand"
+          />
+          <span className="text-sm font-medium text-slate-700">
+            Dringend — ich brauche schnell Hilfe
+          </span>
+        </label>
+
         <button
           type="submit"
           className="mt-2 h-12 rounded-full bg-brand text-base font-semibold text-white transition-colors hover:bg-brand-dark"
