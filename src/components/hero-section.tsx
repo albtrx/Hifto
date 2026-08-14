@@ -2,7 +2,7 @@ import { categories } from "@/lib/categories";
 
 export function HeroSection() {
   return (
-    <section id="anfrage-erstellen" className="scroll-mt-24">
+    <section>
       <div className="mx-auto max-w-3xl px-4 py-16 text-center sm:px-6 sm:py-24">
         <h1 className="text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">
           Du brauchst etwas?
@@ -13,19 +13,23 @@ export function HeroSection() {
           Beschreibe, was du brauchst. Finde Menschen, die dir helfen können.
         </p>
 
-        <div className="mx-auto mt-8 flex max-w-xl flex-col gap-3 sm:flex-row">
+        <form
+          action="/anfrage/neu"
+          className="mx-auto mt-8 flex max-w-xl flex-col gap-3 sm:flex-row"
+        >
           <input
             type="text"
+            name="titel"
             placeholder="Was brauchst du gerade?"
             className="h-14 flex-1 rounded-full border border-slate-300 bg-white px-6 text-base text-slate-900 placeholder:text-slate-400 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30"
           />
           <button
-            type="button"
+            type="submit"
             className="h-14 shrink-0 rounded-full bg-brand px-8 text-base font-semibold text-white transition-colors hover:bg-brand-dark"
           >
             Anfrage erstellen
           </button>
-        </div>
+        </form>
 
         <div className="mt-14">
           <p className="mb-4 text-sm font-medium text-slate-500">

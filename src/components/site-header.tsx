@@ -51,12 +51,12 @@ export async function SiteHeader() {
               Einloggen
             </Link>
           )}
-          <a
-            href="#anfrage-erstellen"
+          <Link
+            href="/anfrage/neu"
             className="rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-dark"
           >
             Anfrage erstellen
-          </a>
+          </Link>
         </div>
       </div>
     </header>
