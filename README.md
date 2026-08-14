@@ -4,6 +4,8 @@ Marktplatz für akute Bedürfnisse: Nutzer beschreiben, was sie gerade brauchen 
 
 **Zielgruppe:** 🇩🇪 Deutschland · 🇦🇹 Österreich · 🇨🇭 Schweiz (Architektur ist offen für weitere Länder)
 
+**Live:** [hifto.vercel.app](https://hifto.vercel.app)
+
 ## Tech-Stack
 
 - **Framework:** Next.js (App Router) + TypeScript
