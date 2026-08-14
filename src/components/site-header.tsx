@@ -41,9 +41,12 @@ export async function SiteHeader() {
         <div className="flex items-center gap-3">
           {user ? (
             <>
-              <span className="hidden text-sm font-medium text-slate-600 sm:inline">
-                {user.email}
-              </span>
+              <Link
+                href={`/profil/${user.id}`}
+                className="hidden text-sm font-medium text-slate-600 hover:text-brand sm:inline"
+              >
+                Profil
+              </Link>
               <form action={logout}>
                 <button
                   type="submit"
