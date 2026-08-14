@@ -27,7 +27,7 @@ Marktplatz für akute Bedürfnisse: Nutzer beschreiben, was sie gerade brauchen 
 - [x] Phase 7 — "Ich kann helfen"
 - [x] Phase 8 — Messaging
 - [x] Phase 9 — Profile & Bewertungen
-- [ ] Phase 10 — Benachrichtigungen
+- [x] Phase 10 — Benachrichtigungen
 - [ ] Phase 11 — Moderation & Sicherheit
 - [ ] Phase 12 — Mobile Optimierung
 
