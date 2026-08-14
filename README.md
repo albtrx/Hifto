@@ -14,7 +14,7 @@ Marktplatz für akute Bedürfnisse: Nutzer beschreiben, was sie gerade brauchen 
 
 ## Status
 
-🚧 In Entwicklung — MVP-Aufbau läuft in Phasen.
+✅ Alle 12 MVP-Phasen umgesetzt.
 
 ## MVP-Roadmap
 
@@ -29,7 +29,7 @@ Marktplatz für akute Bedürfnisse: Nutzer beschreiben, was sie gerade brauchen 
 - [x] Phase 9 — Profile & Bewertungen
 - [x] Phase 10 — Benachrichtigungen
 - [x] Phase 11 — Moderation & Sicherheit
-- [ ] Phase 12 — Mobile Optimierung
+- [x] Phase 12 — Mobile Optimierung
 
 ## Lokale Entwicklung
 
