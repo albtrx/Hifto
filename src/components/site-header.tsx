@@ -28,6 +28,14 @@ export async function SiteHeader() {
           <span className="text-sm font-medium text-slate-600">
             Wie es funktioniert
           </span>
+          {user && (
+            <Link
+              href="/nachrichten"
+              className="text-sm font-medium text-slate-600 hover:text-brand"
+            >
+              Nachrichten
+            </Link>
+          )}
         </nav>
 
         <div className="flex items-center gap-3">

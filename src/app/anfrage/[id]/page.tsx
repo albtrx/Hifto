@@ -9,6 +9,7 @@ type ResponseRow = {
   id: string;
   message: string;
   created_at: string;
+  responder_id: string;
   profiles: { full_name: string | null } | null;
 };
 
@@ -55,7 +56,7 @@ export default async function RequestDetailPage({
   if (isOwner) {
     const { data } = await supabase
       .from("responses")
-      .select("id, message, created_at, profiles(full_name)")
+      .select("id, message, created_at, responder_id, profiles(full_name)")
       .eq("request_id", id)
       .order("created_at", { ascending: false });
     responses = (data as unknown as ResponseRow[]) ?? [];
@@ -124,9 +125,17 @@ export default async function RequestDetailPage({
                       {r.profiles?.full_name ?? "Ein Nutzer"}
                     </p>
                     <p className="mt-1 text-sm text-slate-600">{r.message}</p>
-                    <p className="mt-2 text-xs text-slate-400">
-                      {formatRelativeTime(r.created_at)}
-                    </p>
+                    <div className="mt-2 flex items-center justify-between">
+                      <p className="text-xs text-slate-400">
+                        {formatRelativeTime(r.created_at)}
+                      </p>
+                      <Link
+                        href={`/nachrichten/${id}/${r.responder_id}`}
+                        className="text-xs font-semibold text-brand hover:underline"
+                      >
+                        Antworten
+                      </Link>
+                    </div>
                   </li>
                 ))}
               </ul>
@@ -137,10 +146,20 @@ export default async function RequestDetailPage({
             Diese Anfrage ist bereits geschlossen.
           </p>
         ) : alreadyResponded ? (
-          <p className="text-sm text-slate-500">
-            {erfolg === "1" && "Deine Nachricht wurde gesendet! "}
-            Der Ersteller wurde benachrichtigt.
-          </p>
+          <div>
+            <p className="text-sm text-slate-500">
+              {erfolg === "1" && "Deine Nachricht wurde gesendet! "}
+              Der Ersteller wurde benachrichtigt.
+            </p>
+            {user && (
+              <Link
+                href={`/nachrichten/${id}/${user.id}`}
+                className="mt-3 inline-block text-sm font-semibold text-brand hover:underline"
+              >
+                Zur Unterhaltung →
+              </Link>
+            )}
+          </div>
         ) : (
           <>
             <h2 className="text-lg font-semibold text-slate-900">
