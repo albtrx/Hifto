@@ -28,7 +28,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       data-scroll-behavior="smooth"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col bg-slate-50 pb-16 font-sans lg:pb-0">
+      <body className="flex min-h-full flex-col bg-background pb-16 font-sans text-foreground lg:pb-0">
         <SiteHeader />
         <main className="flex flex-1 flex-col">{children}</main>
         <SiteFooter />
