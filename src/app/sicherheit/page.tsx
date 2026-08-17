@@ -2,7 +2,7 @@ export default function SafetyPage() {
   return (
     <div className="mx-auto w-full max-w-2xl px-4 py-12 sm:px-6">
       <h1 className="text-3xl font-bold tracking-tight text-slate-900">
-        Sicherheit &amp; Regeln
+        Sicher auf Hifto
       </h1>
       <p className="mt-4 text-slate-600">
         Hifto bringt Menschen zusammen, die sich vorher meist nicht kennen.
@@ -17,8 +17,32 @@ export default function SafetyPage() {
           <p className="mt-1 text-slate-600">
             Anfragen zeigen keine privaten Kontaktdaten wie Telefonnummer
             oder E-Mail-Adresse öffentlich an. Die erste Kontaktaufnahme
-            läuft immer über "Ich kann helfen" und die eingebaute
+            läuft immer über ein Angebot und die eingebaute
             Nachrichtenfunktion.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="text-lg font-semibold text-slate-900">
+            Zahlungen nur direkt zwischen euch
+          </h2>
+          <p className="mt-1 text-slate-600">
+            Hifto wickelt aktuell keine Zahlungen ab. Vereinbart Preise und
+            Zahlungsart direkt miteinander und zahlt nie im Voraus an
+            jemanden, den ihr nicht kennt oder nicht persönlich getroffen
+            habt.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="text-lg font-semibold text-slate-900">
+            Auf Verifizierung achten
+          </h2>
+          <p className="mt-1 text-slate-600">
+            Anbieter können ein "Verifiziert"-Abzeichen erhalten. Achte
+            besonders bei gewerblichen Dienstleistungen darauf, ob ein
+            Anbieter verifiziert ist, und schau dir Bewertungen und
+            abgeschlossene Aufträge im Profil an.
           </p>
         </section>
 
@@ -49,8 +73,7 @@ export default function SafetyPage() {
             Vorsicht bei Treffen
           </h2>
           <p className="mt-1 text-slate-600">
-            Triff dich nach Möglichkeit an belebten, öffentlichen Orten und
-            gib niemals Zahlungen im Voraus, ohne die Person zu kennen. Hifto
+            Triff dich nach Möglichkeit an belebten, öffentlichen Orten. Hifto
             ist eine Vermittlungsplattform und keine Vertragspartei zwischen
             Nutzern.
           </p>

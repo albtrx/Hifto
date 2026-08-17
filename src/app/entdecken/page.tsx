@@ -11,6 +11,7 @@ type SearchParams = {
   heute?: string;
   budget?: string;
   dringend?: string;
+  alle?: string;
 };
 
 export default async function DiscoverPage({
@@ -18,9 +19,29 @@ export default async function DiscoverPage({
 }: {
   searchParams: Promise<SearchParams>;
 }) {
-  const { kategorie, heute, budget, dringend } = await searchParams;
+  const { kategorie, heute, budget, dringend, alle } = await searchParams;
 
   const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  let providerCategories: string[] = [];
+  if (user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("is_provider, provider_categories")
+      .eq("id", user.id)
+      .single();
+    if (profile?.is_provider) {
+      providerCategories = profile.provider_categories ?? [];
+    }
+  }
+
+  const isPersonalized =
+    !kategorie && alle !== "1" && providerCategories.length > 0;
+
   let query = supabase
     .from("requests")
     .select("*")
@@ -29,6 +50,7 @@ export default async function DiscoverPage({
     .order("created_at", { ascending: false });
 
   if (kategorie) query = query.eq("category", kategorie);
+  else if (isPersonalized) query = query.in("category", providerCategories);
   if (dringend === "1") query = query.eq("is_urgent", true);
   if (budget) query = query.lte("budget_amount", Number(budget));
 
@@ -44,10 +66,6 @@ export default async function DiscoverPage({
 
   const { data: requests } = await query;
   let list = (requests ?? []) as RequestListItem[];
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
 
   if (user) {
     const { data: blocks } = await supabase
@@ -70,6 +88,18 @@ export default async function DiscoverPage({
         Finde Kunden, die gerade Hilfe benötigen.{" "}
         {list.length} offene {list.length === 1 ? "Auftrag" : "Aufträge"}
       </p>
+
+      {isPersonalized && (
+        <p className="mt-3 flex flex-wrap items-center gap-2 text-sm text-slate-500">
+          Gefiltert nach deinen Dienstleistungen.
+          <Link
+            href="/entdecken?alle=1"
+            className="font-semibold text-brand hover:underline"
+          >
+            Alle Kategorien anzeigen
+          </Link>
+        </p>
+      )}
 
       <form className="mt-6 flex flex-wrap items-end gap-x-4 gap-y-3 rounded-2xl border border-slate-200 bg-white p-4">
         <label className="flex flex-col gap-1">

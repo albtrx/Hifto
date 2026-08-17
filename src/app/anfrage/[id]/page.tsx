@@ -218,6 +218,13 @@ export default async function RequestDetailPage({
                       </span>
                     </div>
 
+                    <Link
+                      href={`/profil/${o.provider_id}`}
+                      className="mt-1 inline-block text-xs font-semibold text-brand hover:underline"
+                    >
+                      Profil ansehen
+                    </Link>
+
                     <p className="mt-2 text-sm text-slate-600">{o.message}</p>
                     <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500">
                       <span>🕐 {o.availability}</span>
