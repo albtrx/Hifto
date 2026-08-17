@@ -69,6 +69,14 @@ export default async function ConversationPage({
     );
   }
 
+  await supabase
+    .from("notifications")
+    .update({ is_read: true })
+    .eq("user_id", user.id)
+    .eq("type", "new_message")
+    .eq("related_request_id", requestId)
+    .eq("is_read", false);
+
   const otherPartyId = isOwner ? providerId : request.user_id;
   const { data: otherProfile } = await supabase
     .from("profiles")

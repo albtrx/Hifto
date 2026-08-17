@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { logout } from "@/app/login/actions";
+import { getUnreadCounts } from "@/lib/notifications";
 
 export async function SiteHeader() {
   const supabase = await createClient();
@@ -8,18 +9,16 @@ export async function SiteHeader() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  let unreadCount = 0;
+  let bellCount = 0;
+  let messageCount = 0;
   let isAdmin = false;
   if (user) {
-    const [{ count }, { data: profile }] = await Promise.all([
-      supabase
-        .from("notifications")
-        .select("id", { count: "exact", head: true })
-        .eq("user_id", user.id)
-        .eq("is_read", false),
+    const [counts, { data: profile }] = await Promise.all([
+      getUnreadCounts(supabase, user.id),
       supabase.from("profiles").select("is_admin").eq("id", user.id).single(),
     ]);
-    unreadCount = count ?? 0;
+    bellCount = counts.bellCount;
+    messageCount = counts.messageCount;
     isAdmin = profile?.is_admin ?? false;
   }
 
@@ -46,9 +45,14 @@ export async function SiteHeader() {
           {user && (
             <Link
               href="/nachrichten"
-              className="text-sm font-medium text-slate-600 hover:text-brand"
+              className="relative text-sm font-medium text-slate-600 hover:text-brand"
             >
               Nachrichten
+              {messageCount > 0 && (
+                <span className="absolute -right-3 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
+                  {messageCount}
+                </span>
+              )}
             </Link>
           )}
         </nav>
@@ -62,9 +66,9 @@ export async function SiteHeader() {
                 aria-label="Benachrichtigungen"
               >
                 🔔
-                {unreadCount > 0 && (
+                {bellCount > 0 && (
                   <span className="absolute -right-1.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
-                    {unreadCount}
+                    {bellCount}
                   </span>
                 )}
               </Link>
