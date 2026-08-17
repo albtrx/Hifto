@@ -160,7 +160,7 @@ export default async function ProfilePage({
           >
             Blockierte Nutzer
           </Link>
-          <form action={logout} className="sm:hidden">
+          <form action={logout} className="lg:hidden">
             <button
               type="submit"
               className="inline-flex h-11 items-center justify-center rounded-full border border-slate-300 px-6 text-sm font-semibold text-slate-700 transition-colors hover:border-red-400 hover:text-red-600"
