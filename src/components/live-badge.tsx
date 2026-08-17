@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 export function LiveBadge({
@@ -15,6 +15,7 @@ export function LiveBadge({
   className: string;
 }) {
   const [count, setCount] = useState(initialCount);
+  const instanceId = useId();
 
   useEffect(() => {
     const supabase = createClient();
@@ -34,7 +35,7 @@ export function LiveBadge({
     }
 
     const channel = supabase
-      .channel(`notif-${kind}-${userId}`)
+      .channel(`notif-${kind}-${userId}-${instanceId}`)
       .on(
         "postgres_changes",
         {
@@ -50,7 +51,7 @@ export function LiveBadge({
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [userId, kind]);
+  }, [userId, kind, instanceId]);
 
   if (count <= 0) return null;
 
