@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { formatRelativeTime } from "@/lib/format";
+import { ChatWindow } from "@/components/chat-window";
 import { sendMessage } from "./actions";
 
 type TimelineItem = {
@@ -123,25 +123,12 @@ export default async function ConversationPage({
         </Link>
       </div>
 
-      <div className="mt-6 flex flex-1 flex-col gap-3">
-        {timeline.map((item) => (
-          <div
-            key={item.id}
-            className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm ${
-              item.isMine
-                ? "self-end bg-brand text-white"
-                : "self-start bg-white text-slate-800 border border-slate-200"
-            }`}
-          >
-            <p>{item.body}</p>
-            <p
-              className={`mt-1 text-xs ${item.isMine ? "text-white/70" : "text-slate-400"}`}
-            >
-              {formatRelativeTime(item.createdAt)}
-            </p>
-          </div>
-        ))}
-      </div>
+      <ChatWindow
+        initialMessages={timeline}
+        requestId={requestId}
+        providerId={providerId}
+        userId={user.id}
+      />
 
       {error && (
         <p className="mt-4 rounded-lg bg-red-50 px-4 py-2 text-sm text-red-700">
