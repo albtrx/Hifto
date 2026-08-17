@@ -11,12 +11,12 @@ export async function sendMessage(formData: FormData) {
   } = await supabase.auth.getUser();
 
   const requestId = formData.get("requestId") as string;
-  const responderId = formData.get("responderId") as string;
+  const providerId = formData.get("providerId") as string;
   const body = (formData.get("body") as string)?.trim();
 
   if (!user) {
     redirect(
-      `/login?next=${encodeURIComponent(`/nachrichten/${requestId}/${responderId}`)}`,
+      `/login?next=${encodeURIComponent(`/nachrichten/${requestId}/${providerId}`)}`,
     );
   }
 
@@ -31,7 +31,7 @@ export async function sendMessage(formData: FormData) {
   if (body && !tooManyMessages) {
     const { error } = await supabase.from("messages").insert({
       request_id: requestId,
-      responder_id: responderId,
+      provider_id: providerId,
       sender_id: user.id,
       body,
     });
@@ -41,5 +41,5 @@ export async function sendMessage(formData: FormData) {
     }
   }
 
-  redirect(`/nachrichten/${requestId}/${responderId}`);
+  redirect(`/nachrichten/${requestId}/${providerId}`);
 }

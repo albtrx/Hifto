@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { categories } from "@/lib/categories";
 import { blockUser, unblockUser } from "./actions";
 import { logout } from "@/app/login/actions";
 
@@ -17,7 +18,9 @@ export default async function ProfilePage({
   const supabase = await createClient();
   const { data: profile } = await supabase
     .from("profiles")
-    .select("id, full_name, city, bio, avatar_url, created_at")
+    .select(
+      "id, full_name, city, bio, avatar_url, created_at, is_provider, is_verified, company_name, provider_categories",
+    )
     .eq("id", id)
     .single();
 
@@ -76,9 +79,16 @@ export default async function ProfilePage({
         )}
 
         <div>
-          <h1 className="text-xl font-bold text-slate-900">
-            {profile.full_name ?? "Unbenannter Nutzer"}
-          </h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl font-bold text-slate-900">
+              {profile.company_name || profile.full_name || "Unbenannter Nutzer"}
+            </h1>
+            {profile.is_provider && profile.is_verified && (
+              <span className="rounded-full bg-brand/10 px-2 py-0.5 text-xs font-semibold text-brand">
+                ✓ Verifiziert
+              </span>
+            )}
+          </div>
           {profile.city && (
             <p className="text-sm text-slate-500">📍 {profile.city}</p>
           )}
@@ -90,6 +100,22 @@ export default async function ProfilePage({
         <p className="mt-6 whitespace-pre-wrap text-slate-700">
           {profile.bio}
         </p>
+      )}
+
+      {profile.is_provider && profile.provider_categories?.length > 0 && (
+        <div className="mt-4 flex flex-wrap gap-2">
+          {profile.provider_categories.map((slug: string) => {
+            const category = categories.find((c) => c.slug === slug);
+            return category ? (
+              <span
+                key={slug}
+                className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600"
+              >
+                {category.emoji} {category.label}
+              </span>
+            ) : null;
+          })}
+        </div>
       )}
 
       <div className="mt-6 flex gap-6 rounded-2xl border border-slate-200 bg-white p-4">
@@ -105,7 +131,7 @@ export default async function ProfilePage({
           <p className="text-lg font-bold text-slate-900">
             {successfulHelps ?? 0}
           </p>
-          <p className="text-xs text-slate-500">Erfolgreiche Hilfen</p>
+          <p className="text-xs text-slate-500">Abgeschlossene Aufträge</p>
         </div>
       </div>
 

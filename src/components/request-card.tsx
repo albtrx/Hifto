@@ -51,7 +51,7 @@ export function RequestCard({ request }: { request: RequestListItem }) {
           {formatRelativeTime(request.created_at)}
         </span>
         <span className="rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white">
-          Ich kann helfen
+          Angebot abgeben
         </span>
       </div>
     </Link>

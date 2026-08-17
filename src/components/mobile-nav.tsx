@@ -10,14 +10,14 @@ export async function MobileNav() {
   const items = user
     ? [
         { href: "/", label: "Start", icon: "🏠" },
-        { href: "/entdecken", label: "Entdecken", icon: "🔍" },
+        { href: "/entdecken", label: "Aufträge", icon: "🔍" },
         { href: "/anfrage/neu", label: "Neu", icon: "➕" },
         { href: "/nachrichten", label: "Chat", icon: "💬" },
         { href: `/profil/${user.id}`, label: "Profil", icon: "👤" },
       ]
     : [
         { href: "/", label: "Start", icon: "🏠" },
-        { href: "/entdecken", label: "Entdecken", icon: "🔍" },
+        { href: "/entdecken", label: "Aufträge", icon: "🔍" },
         { href: "/anfrage/neu", label: "Neu", icon: "➕" },
         { href: "/login", label: "Login", icon: "🔑" },
       ];

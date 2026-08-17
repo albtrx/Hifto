@@ -6,7 +6,7 @@ import { formatRelativeTime } from "@/lib/format";
 type Conversation = {
   requestId: string;
   requestTitle: string;
-  responderId: string;
+  providerId: string;
   otherPartyLabel: string;
   preview: string;
   lastAt: string;
@@ -20,46 +20,49 @@ export default async function MessagesPage() {
 
   if (!user) redirect("/login?next=/nachrichten");
 
-  const [{ data: asResponder }, { data: asOwner }] = await Promise.all([
+  const [{ data: asProvider }, { data: asOwner }] = await Promise.all([
     supabase
-      .from("responses")
-      .select("message, created_at, request_id, responder_id, requests(title)")
-      .eq("responder_id", user.id),
+      .from("offers")
+      .select("message, created_at, request_id, provider_id, requests(title)")
+      .eq("provider_id", user.id)
+      .eq("status", "accepted"),
     supabase
       .from("requests")
       .select(
-        "id, title, responses(message, created_at, responder_id, profiles(full_name))",
+        "id, title, offers(message, created_at, provider_id, status, profiles(full_name))",
       )
       .eq("user_id", user.id),
   ]);
 
   const conversations: Conversation[] = [];
 
-  for (const r of asResponder ?? []) {
+  for (const o of asProvider ?? []) {
     conversations.push({
-      requestId: r.request_id,
-      requestTitle: (r.requests as unknown as { title: string } | null)?.title ?? "",
-      responderId: r.responder_id,
-      otherPartyLabel: "Ersteller der Anfrage",
-      preview: r.message,
-      lastAt: r.created_at,
+      requestId: o.request_id,
+      requestTitle: (o.requests as unknown as { title: string } | null)?.title ?? "",
+      providerId: o.provider_id,
+      otherPartyLabel: "Kunde",
+      preview: o.message,
+      lastAt: o.created_at,
     });
   }
 
   for (const req of asOwner ?? []) {
-    for (const resp of (req.responses as unknown as {
+    for (const offer of (req.offers as unknown as {
       message: string;
       created_at: string;
-      responder_id: string;
+      provider_id: string;
+      status: string;
       profiles: { full_name: string | null } | null;
     }[]) ?? []) {
+      if (offer.status !== "accepted") continue;
       conversations.push({
         requestId: req.id,
         requestTitle: req.title,
-        responderId: resp.responder_id,
-        otherPartyLabel: resp.profiles?.full_name ?? "Ein Nutzer",
-        preview: resp.message,
-        lastAt: resp.created_at,
+        providerId: offer.provider_id,
+        otherPartyLabel: offer.profiles?.full_name ?? "Ein Anbieter",
+        preview: offer.message,
+        lastAt: offer.created_at,
       });
     }
   }
@@ -76,16 +79,15 @@ export default async function MessagesPage() {
 
       {conversations.length === 0 ? (
         <p className="mt-6 text-slate-500">
-          Noch keine Unterhaltungen. Sobald jemand auf eine deiner Anfragen
-          antwortet oder du selbst "Ich kann helfen" klickst, erscheint die
-          Unterhaltung hier.
+          Noch keine Unterhaltungen. Sobald ein Angebot angenommen wurde,
+          erscheint die Unterhaltung hier.
         </p>
       ) : (
         <ul className="mt-6 flex flex-col gap-3">
           {conversations.map((c) => (
-            <li key={`${c.requestId}-${c.responderId}`}>
+            <li key={`${c.requestId}-${c.providerId}`}>
               <Link
-                href={`/nachrichten/${c.requestId}/${c.responderId}`}
+                href={`/nachrichten/${c.requestId}/${c.providerId}`}
                 className="block rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md"
               >
                 <div className="flex items-center justify-between gap-2">

@@ -14,9 +14,9 @@ type TimelineItem = {
 export default async function ConversationPage({
   params,
 }: {
-  params: Promise<{ requestId: string; responderId: string }>;
+  params: Promise<{ requestId: string; providerId: string }>;
 }) {
-  const { requestId, responderId } = await params;
+  const { requestId, providerId } = await params;
 
   const supabase = await createClient();
   const {
@@ -25,7 +25,7 @@ export default async function ConversationPage({
 
   if (!user) {
     redirect(
-      `/login?next=${encodeURIComponent(`/nachrichten/${requestId}/${responderId}`)}`,
+      `/login?next=${encodeURIComponent(`/nachrichten/${requestId}/${providerId}`)}`,
     );
   }
 
@@ -38,11 +38,35 @@ export default async function ConversationPage({
   if (!request) notFound();
 
   const isOwner = user.id === request.user_id;
-  const isResponder = user.id === responderId;
+  const isProvider = user.id === providerId;
 
-  if (!isOwner && !isResponder) notFound();
+  if (!isOwner && !isProvider) notFound();
 
-  const otherPartyId = isOwner ? responderId : request.user_id;
+  const { data: offer } = await supabase
+    .from("offers")
+    .select("message, created_at, provider_id, status")
+    .eq("request_id", requestId)
+    .eq("provider_id", providerId)
+    .single();
+
+  if (!offer || offer.status !== "accepted") {
+    return (
+      <div className="mx-auto w-full max-w-2xl px-4 py-12 sm:px-6">
+        <Link
+          href="/nachrichten"
+          className="text-sm text-slate-500 hover:text-brand"
+        >
+          ← Alle Nachrichten
+        </Link>
+        <p className="mt-6 text-slate-500">
+          Dieser Chat ist noch nicht verfügbar — er wird freigeschaltet,
+          sobald das Angebot angenommen wurde.
+        </p>
+      </div>
+    );
+  }
+
+  const otherPartyId = isOwner ? providerId : request.user_id;
   const { data: otherProfile } = await supabase
     .from("profiles")
     .select("full_name")
@@ -50,30 +74,21 @@ export default async function ConversationPage({
     .single();
   const otherPartyLabel = otherProfile?.full_name ?? "Ein Nutzer";
 
-  const { data: initialResponse } = await supabase
-    .from("responses")
-    .select("message, created_at, responder_id")
-    .eq("request_id", requestId)
-    .eq("responder_id", responderId)
-    .single();
-
   const { data: messages } = await supabase
     .from("messages")
     .select("id, body, created_at, sender_id")
     .eq("request_id", requestId)
-    .eq("responder_id", responderId)
+    .eq("provider_id", providerId)
     .order("created_at", { ascending: true });
 
-  const timeline: TimelineItem[] = [];
-
-  if (initialResponse) {
-    timeline.push({
+  const timeline: TimelineItem[] = [
+    {
       id: "initial",
-      body: initialResponse.message,
-      createdAt: initialResponse.created_at,
-      isMine: initialResponse.responder_id === user.id,
-    });
-  }
+      body: offer.message,
+      createdAt: offer.created_at,
+      isMine: offer.provider_id === user.id,
+    },
+  ];
 
   for (const m of messages ?? []) {
     timeline.push({
@@ -130,7 +145,7 @@ export default async function ConversationPage({
         className="mt-6 flex items-end gap-3 border-t border-slate-200 pt-4"
       >
         <input type="hidden" name="requestId" value={requestId} />
-        <input type="hidden" name="responderId" value={responderId} />
+        <input type="hidden" name="providerId" value={providerId} />
         <textarea
           name="body"
           required

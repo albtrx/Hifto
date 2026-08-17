@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { categories } from "@/lib/categories";
 
 export function HeroSection() {
@@ -5,31 +6,33 @@ export function HeroSection() {
     <section>
       <div className="mx-auto max-w-3xl px-4 py-16 text-center sm:px-6 sm:py-24">
         <h1 className="text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">
-          Du brauchst etwas?
+          Du brauchst jemanden?
           <br />
-          Frag die Leute in deiner Nähe.
+          Lass Anbieter zu dir kommen.
         </h1>
         <p className="mx-auto mt-4 max-w-xl text-lg text-slate-600">
-          Beschreibe, was du brauchst. Finde Menschen, die dir helfen können.
+          Beschreibe deinen Auftrag kostenlos und erhalte passende Angebote
+          von Anbietern in deiner Nähe.
         </p>
 
-        <form
-          action="/anfrage/neu"
-          className="mx-auto mt-8 flex max-w-xl flex-col gap-3 sm:flex-row"
-        >
-          <input
-            type="text"
-            name="titel"
-            placeholder="Was brauchst du gerade?"
-            className="h-14 flex-1 rounded-full border border-slate-300 bg-white px-6 text-base text-slate-900 placeholder:text-slate-400 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30"
-          />
-          <button
-            type="submit"
-            className="h-14 shrink-0 rounded-full bg-brand px-8 text-base font-semibold text-white transition-colors hover:bg-brand-dark"
+        <div className="mx-auto mt-8 flex max-w-xl flex-col items-center gap-3 sm:flex-row sm:justify-center">
+          <Link
+            href="/anfrage/neu"
+            className="flex h-16 w-full flex-col items-center justify-center rounded-2xl bg-brand px-8 text-white shadow-sm transition-colors hover:bg-brand-dark sm:w-auto sm:min-w-64"
           >
-            Anfrage erstellen
-          </button>
-        </form>
+            <span className="text-lg font-semibold">Ich brauche etwas</span>
+            <span className="text-xs text-white/80">Anfrage erstellen</span>
+          </Link>
+          <Link
+            href="/entdecken"
+            className="flex h-16 w-full flex-col items-center justify-center rounded-2xl border border-slate-300 px-8 text-slate-700 transition-colors hover:border-brand hover:text-brand sm:w-auto sm:min-w-64"
+          >
+            <span className="text-base font-semibold">
+              Ich möchte Aufträge
+            </span>
+            <span className="text-xs text-slate-500">Anbieter werden</span>
+          </Link>
+        </div>
 
         <div className="mt-14">
           <p className="mb-4 text-sm font-medium text-slate-500">

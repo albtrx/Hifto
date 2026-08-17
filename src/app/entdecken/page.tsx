@@ -64,10 +64,11 @@ export default async function DiscoverPage({
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-12 sm:px-6">
       <h1 className="text-3xl font-bold tracking-tight text-slate-900">
-        Anfragen in deiner Nähe
+        Aufträge in deiner Nähe
       </h1>
       <p className="mt-2 text-slate-600">
-        {list.length} offene {list.length === 1 ? "Anfrage" : "Anfragen"}
+        Finde Kunden, die gerade Hilfe benötigen.{" "}
+        {list.length} offene {list.length === 1 ? "Auftrag" : "Aufträge"}
       </p>
 
       <form className="mt-6 flex flex-wrap items-end gap-x-4 gap-y-3 rounded-2xl border border-slate-200 bg-white p-4">

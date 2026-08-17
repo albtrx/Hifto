@@ -3,18 +3,26 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { categories } from "@/lib/categories";
 import { formatBudget, formatNeededAt, formatRelativeTime } from "@/lib/format";
-import { respondToRequest, closeRequest, submitReview } from "./actions";
+import { ProviderBadge } from "@/components/provider-badge";
+import { submitOffer, acceptOffer, closeRequest, submitReview } from "./actions";
 
-type ResponseRow = {
+type OfferRow = {
   id: string;
+  price: number;
+  availability: string;
   message: string;
+  estimated_duration: string | null;
+  status: string;
   created_at: string;
-  responder_id: string;
-  profiles: { full_name: string | null } | null;
+  provider_id: string;
+  profiles: { full_name: string | null; is_verified: boolean } | null;
 };
 
 const ratingSelectClass =
   "h-10 rounded-lg border border-slate-300 px-2 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30";
+
+const inputClass =
+  "h-11 rounded-xl border border-slate-300 px-4 text-base text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30";
 
 function RatingField({ name, label }: { name: string; label: string }) {
   return (
@@ -60,26 +68,30 @@ export default async function RequestDetailPage({
   const category = categories.find((c) => c.slug === request.category);
   const budget = formatBudget(request.budget_amount, request.budget_currency);
 
-  let alreadyResponded = false;
-  let responses: ResponseRow[] = [];
+  let myOffer: OfferRow | null = null;
+  let offers: OfferRow[] = [];
 
   if (user && !isOwner) {
     const { data: existing } = await supabase
-      .from("responses")
-      .select("id")
+      .from("offers")
+      .select(
+        "id, price, availability, message, estimated_duration, status, created_at, provider_id, profiles(full_name, is_verified)",
+      )
       .eq("request_id", id)
-      .eq("responder_id", user.id)
+      .eq("provider_id", user.id)
       .maybeSingle();
-    alreadyResponded = Boolean(existing);
+    myOffer = (existing as unknown as OfferRow) ?? null;
   }
 
   if (isOwner) {
     const { data } = await supabase
-      .from("responses")
-      .select("id, message, created_at, responder_id, profiles(full_name)")
+      .from("offers")
+      .select(
+        "id, price, availability, message, estimated_duration, status, created_at, provider_id, profiles(full_name, is_verified)",
+      )
       .eq("request_id", id)
       .order("created_at", { ascending: false });
-    responses = (data as unknown as ResponseRow[]) ?? [];
+    offers = (data as unknown as OfferRow[]) ?? [];
   }
 
   const canReview = request.status === "closed" && (isOwner || isHelper);
@@ -105,6 +117,11 @@ export default async function RequestDetailPage({
     ownerName = ownerProfile?.full_name ?? null;
   }
 
+  const statusLabel: Record<string, string> = {
+    assigned: "Vergeben",
+    closed: "Abgeschlossen",
+  };
+
   return (
     <div className="mx-auto w-full max-w-2xl px-4 py-12 sm:px-6">
       <Link
@@ -119,9 +136,9 @@ export default async function RequestDetailPage({
           {category?.emoji} {request.title}
         </h1>
         <div className="flex shrink-0 gap-2">
-          {request.status === "closed" && (
+          {statusLabel[request.status] && (
             <span className="rounded-full bg-slate-200 px-2.5 py-1 text-xs font-semibold text-slate-600">
-              Abgeschlossen
+              {statusLabel[request.status]}
             </span>
           )}
           {request.is_urgent && (
@@ -177,109 +194,149 @@ export default async function RequestDetailPage({
         {isOwner ? (
           <>
             <h2 className="text-lg font-semibold text-slate-900">
-              Antworten ({responses.length})
+              Angebote ({offers.length})
             </h2>
-            {responses.length === 0 ? (
+            {offers.length === 0 ? (
               <p className="mt-2 text-sm text-slate-500">
-                Noch niemand hat sich gemeldet.
+                Noch keine Angebote eingegangen.
               </p>
             ) : (
               <ul className="mt-4 flex flex-col gap-4">
-                {responses.map((r) => (
+                {offers.map((o) => (
                   <li
-                    key={r.id}
+                    key={o.id}
                     className="rounded-xl border border-slate-200 p-4"
                   >
-                    <div className="flex items-center gap-2">
-                      <p className="text-sm font-medium text-slate-900">
-                        {r.profiles?.full_name ?? "Ein Nutzer"}
-                      </p>
-                      {request.helper_id === r.responder_id && (
-                        <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-semibold text-green-700">
-                          ✓ Hat geholfen
-                        </span>
+                    <div className="flex items-start justify-between gap-3">
+                      <ProviderBadge
+                        providerId={o.provider_id}
+                        name={o.profiles?.full_name ?? "Ein Nutzer"}
+                        isVerified={o.profiles?.is_verified ?? false}
+                      />
+                      <span className="shrink-0 text-lg font-bold text-slate-900">
+                        {o.price} {request.budget_currency}
+                      </span>
+                    </div>
+
+                    <p className="mt-2 text-sm text-slate-600">{o.message}</p>
+                    <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500">
+                      <span>🕐 {o.availability}</span>
+                      {o.estimated_duration && (
+                        <span>⏱ {o.estimated_duration}</span>
                       )}
                     </div>
-                    <p className="mt-1 text-sm text-slate-600">{r.message}</p>
-                    <div className="mt-2 flex items-center justify-between">
+
+                    <div className="mt-3 flex items-center justify-between">
                       <p className="text-xs text-slate-400">
-                        {formatRelativeTime(r.created_at)}
+                        {formatRelativeTime(o.created_at)}
                       </p>
-                      <Link
-                        href={`/nachrichten/${id}/${r.responder_id}`}
-                        className="text-xs font-semibold text-brand hover:underline"
-                      >
-                        Antworten
-                      </Link>
+                      <div className="flex items-center gap-3">
+                        {o.status === "accepted" && (
+                          <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-semibold text-green-700">
+                            ✓ Angenommen
+                          </span>
+                        )}
+                        {o.status === "rejected" && (
+                          <span className="text-xs text-slate-400">
+                            Nicht ausgewählt
+                          </span>
+                        )}
+                        {o.status === "accepted" && (
+                          <Link
+                            href={`/nachrichten/${id}/${o.provider_id}`}
+                            className="text-xs font-semibold text-brand hover:underline"
+                          >
+                            Zum Chat
+                          </Link>
+                        )}
+                        {request.status === "open" &&
+                          o.status === "pending" && (
+                            <form action={acceptOffer}>
+                              <input
+                                type="hidden"
+                                name="requestId"
+                                value={id}
+                              />
+                              <input
+                                type="hidden"
+                                name="offerId"
+                                value={o.id}
+                              />
+                              <input
+                                type="hidden"
+                                name="providerId"
+                                value={o.provider_id}
+                              />
+                              <button
+                                type="submit"
+                                className="rounded-full bg-brand px-4 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-brand-dark"
+                              >
+                                Angebot annehmen
+                              </button>
+                            </form>
+                          )}
+                      </div>
                     </div>
                   </li>
                 ))}
               </ul>
             )}
 
-            {request.status === "open" && (
+            {request.status === "assigned" && (
               <div className="mt-6 rounded-xl bg-slate-100 p-4">
                 <h3 className="text-sm font-semibold text-slate-900">
-                  Anfrage als erledigt markieren
+                  Auftrag erledigt?
                 </h3>
-                <form
-                  action={closeRequest}
-                  className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-end"
-                >
+                <form action={closeRequest} className="mt-3">
                   <input type="hidden" name="requestId" value={id} />
-                  <label className="flex flex-1 flex-col gap-1">
-                    <span className="text-xs font-medium text-slate-500">
-                      Wer hat geholfen? (optional)
-                    </span>
-                    <select
-                      name="helperId"
-                      defaultValue=""
-                      className={ratingSelectClass}
-                    >
-                      <option value="">Niemand ausgewählt</option>
-                      {responses.map((r) => (
-                        <option key={r.responder_id} value={r.responder_id}>
-                          {r.profiles?.full_name ?? "Ein Nutzer"}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
                   <button
                     type="submit"
                     className="h-10 rounded-full bg-brand px-5 text-sm font-semibold text-white transition-colors hover:bg-brand-dark"
                   >
-                    Abschließen
+                    Als abgeschlossen markieren
                   </button>
                 </form>
               </div>
             )}
           </>
-        ) : request.status !== "open" ? (
+        ) : request.status !== "open" && !myOffer ? (
           <p className="text-sm text-slate-500">
-            Diese Anfrage ist bereits geschlossen.
+            Dieser Auftrag ist bereits vergeben.
           </p>
-        ) : alreadyResponded ? (
+        ) : myOffer ? (
           <div>
-            <p className="text-sm text-slate-500">
-              {erfolg === "1" && "Deine Nachricht wurde gesendet! "}
-              Der Ersteller wurde benachrichtigt.
-            </p>
-            {user && (
-              <Link
-                href={`/nachrichten/${id}/${user.id}`}
-                className="mt-3 inline-block text-sm font-semibold text-brand hover:underline"
-              >
-                Zur Unterhaltung →
-              </Link>
+            {myOffer.status === "accepted" ? (
+              <>
+                <p className="text-sm text-green-700">
+                  🎉 Dein Angebot wurde angenommen!
+                </p>
+                {user && (
+                  <Link
+                    href={`/nachrichten/${id}/${user.id}`}
+                    className="mt-3 inline-block text-sm font-semibold text-brand hover:underline"
+                  >
+                    Zum Chat →
+                  </Link>
+                )}
+              </>
+            ) : myOffer.status === "rejected" ? (
+              <p className="text-sm text-slate-500">
+                Der Kunde hat sich für einen anderen Anbieter entschieden.
+              </p>
+            ) : (
+              <p className="text-sm text-slate-500">
+                {erfolg === "1" && "Dein Angebot wurde gesendet! "}
+                Du wirst benachrichtigt, sobald sich der Kunde entscheidet.
+              </p>
             )}
           </div>
         ) : (
           <>
             <h2 className="text-lg font-semibold text-slate-900">
-              Ich kann helfen
+              Angebot abgeben
             </h2>
             <p className="mt-1 text-sm text-slate-600">
-              Schreib dem Ersteller kurz, wie du helfen kannst.
+              Sag dem Kunden, was du anbietest und was es kostet.
             </p>
 
             {error && (
@@ -293,26 +350,71 @@ export default async function RequestDetailPage({
                 href={`/login?next=${encodeURIComponent(`/anfrage/${id}`)}`}
                 className="mt-4 inline-flex h-12 items-center justify-center rounded-full bg-brand px-8 text-base font-semibold text-white transition-colors hover:bg-brand-dark"
               >
-                Einloggen, um zu helfen
+                Einloggen, um ein Angebot abzugeben
               </Link>
             ) : (
-              <form
-                action={respondToRequest}
-                className="mt-4 flex flex-col gap-3"
-              >
+              <form action={submitOffer} className="mt-4 flex flex-col gap-3">
                 <input type="hidden" name="requestId" value={id} />
-                <textarea
-                  name="message"
-                  required
-                  rows={3}
-                  placeholder="z. B. Ich hab eine Bohrmaschine und Zeit heute Abend."
-                  className="rounded-xl border border-slate-300 px-4 py-3 text-base text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30"
-                />
+
+                <div className="grid grid-cols-2 gap-3">
+                  <label className="flex flex-col gap-1.5">
+                    <span className="text-sm font-medium text-slate-700">
+                      Preis ({request.budget_currency})
+                    </span>
+                    <input
+                      name="price"
+                      type="number"
+                      min={0}
+                      step="0.01"
+                      required
+                      placeholder="180"
+                      className={inputClass}
+                    />
+                  </label>
+                  <label className="flex flex-col gap-1.5">
+                    <span className="text-sm font-medium text-slate-700">
+                      Verfügbarkeit
+                    </span>
+                    <input
+                      name="availability"
+                      type="text"
+                      required
+                      placeholder="Heute 18:00"
+                      className={inputClass}
+                    />
+                  </label>
+                </div>
+
+                <label className="flex flex-col gap-1.5">
+                  <span className="text-sm font-medium text-slate-700">
+                    Erwartete Dauer (optional)
+                  </span>
+                  <input
+                    name="estimatedDuration"
+                    type="text"
+                    placeholder="ca. 1 Stunde"
+                    className={inputClass}
+                  />
+                </label>
+
+                <label className="flex flex-col gap-1.5">
+                  <span className="text-sm font-medium text-slate-700">
+                    Nachricht
+                  </span>
+                  <textarea
+                    name="message"
+                    required
+                    rows={3}
+                    placeholder="z. B. Ich kann heute vorbeikommen und das reparieren."
+                    className="rounded-xl border border-slate-300 px-4 py-3 text-base text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30"
+                  />
+                </label>
+
                 <button
                   type="submit"
                   className="h-12 rounded-full bg-brand text-base font-semibold text-white transition-colors hover:bg-brand-dark"
                 >
-                  Nachricht senden
+                  Angebot senden
                 </button>
               </form>
             )}
@@ -332,7 +434,7 @@ export default async function RequestDetailPage({
                   Wie war's?
                 </h2>
                 <p className="mt-1 text-sm text-slate-600">
-                  Bewerte {isOwner ? "die Person, die dir geholfen hat" : "den Ersteller der Anfrage"}.
+                  Bewerte {isOwner ? "die Person, die dir geholfen hat" : "den Kunden"}.
                 </p>
                 <form
                   action={submitReview}

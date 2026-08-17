@@ -87,5 +87,5 @@ export async function createRequest(formData: FormData) {
     );
   }
 
-  redirect("/anfrage/erstellt");
+  redirect(`/anfrage/erstellt?requestId=${newRequest.id}`);
 }

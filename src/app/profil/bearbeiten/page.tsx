@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { categories } from "@/lib/categories";
 import { updateProfile } from "./actions";
 
 const inputClass =
@@ -21,7 +22,9 @@ export default async function EditProfilePage({
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("full_name, city, bio, avatar_url")
+    .select(
+      "full_name, city, bio, avatar_url, is_provider, company_name, provider_categories",
+    )
     .eq("id", user.id)
     .single();
 
@@ -93,6 +96,60 @@ export default async function EditProfilePage({
             className="rounded-xl border border-slate-300 px-4 py-3 text-base text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30"
           />
         </label>
+
+        <div className="rounded-xl border border-slate-200 p-4">
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              name="isProvider"
+              value="1"
+              defaultChecked={profile?.is_provider ?? false}
+              className="h-4 w-4 rounded border-slate-300 text-brand focus:ring-brand"
+            />
+            <span className="text-sm font-medium text-slate-700">
+              Ich möchte Aufträge annehmen (als Anbieter)
+            </span>
+          </label>
+
+          <div className="mt-4 flex flex-col gap-4">
+            <label className="flex flex-col gap-1.5">
+              <span className="text-sm font-medium text-slate-700">
+                Firma (optional)
+              </span>
+              <input
+                name="companyName"
+                type="text"
+                defaultValue={profile?.company_name ?? ""}
+                placeholder="z. B. Müller Reparaturen GmbH"
+                className={inputClass}
+              />
+            </label>
+
+            <div>
+              <span className="text-sm font-medium text-slate-700">
+                Angebotene Dienstleistungen
+              </span>
+              <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
+                {categories.map((c) => (
+                  <label key={c.slug} className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      name="providerCategories"
+                      value={c.slug}
+                      defaultChecked={profile?.provider_categories?.includes(
+                        c.slug,
+                      )}
+                      className="h-4 w-4 rounded border-slate-300 text-brand focus:ring-brand"
+                    />
+                    <span className="text-sm text-slate-700">
+                      {c.emoji} {c.label}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
 
         <button
           type="submit"

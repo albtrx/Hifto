@@ -15,6 +15,9 @@ export async function updateProfile(formData: FormData) {
   const city = (formData.get("city") as string)?.trim() || null;
   const bio = (formData.get("bio") as string)?.trim() || null;
   const avatar = formData.get("avatar") as File | null;
+  const isProvider = formData.get("isProvider") === "1";
+  const companyName = (formData.get("companyName") as string)?.trim() || null;
+  const providerCategories = formData.getAll("providerCategories") as string[];
 
   let avatarUrl: string | undefined;
 
@@ -44,6 +47,9 @@ export async function updateProfile(formData: FormData) {
       full_name: fullName,
       city,
       bio,
+      is_provider: isProvider,
+      company_name: companyName,
+      provider_categories: isProvider ? providerCategories : [],
       ...(avatarUrl ? { avatar_url: avatarUrl } : {}),
     })
     .eq("id", user.id);

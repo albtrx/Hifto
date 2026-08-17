@@ -38,7 +38,7 @@ export async function SiteHeader() {
             href="/entdecken"
             className="text-sm font-medium text-slate-600 hover:text-brand"
           >
-            Entdecken
+            Aufträge
           </Link>
           <span className="text-sm font-medium text-slate-600">
             Wie es funktioniert
