@@ -13,10 +13,13 @@ type TimelineItem = {
 
 export default async function ConversationPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ requestId: string; providerId: string }>;
+  searchParams: Promise<{ error?: string }>;
 }) {
   const { requestId, providerId } = await params;
+  const { error } = await searchParams;
 
   const supabase = await createClient();
   const {
@@ -139,6 +142,12 @@ export default async function ConversationPage({
           </div>
         ))}
       </div>
+
+      {error && (
+        <p className="mt-4 rounded-lg bg-red-50 px-4 py-2 text-sm text-red-700">
+          {error}
+        </p>
+      )}
 
       <form
         action={sendMessage}

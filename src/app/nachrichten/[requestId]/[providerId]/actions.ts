@@ -28,7 +28,13 @@ export async function sendMessage(formData: FormData) {
     100,
   );
 
-  if (body && !tooManyMessages) {
+  if (tooManyMessages) {
+    redirect(
+      `/nachrichten/${requestId}/${providerId}?error=${encodeURIComponent("Du hast heute schon zu viele Nachrichten geschickt. Versuch es morgen wieder.")}`,
+    );
+  }
+
+  if (body) {
     const { error } = await supabase.from("messages").insert({
       request_id: requestId,
       provider_id: providerId,
@@ -38,6 +44,9 @@ export async function sendMessage(formData: FormData) {
 
     if (error) {
       console.error("sendMessage failed:", error);
+      redirect(
+        `/nachrichten/${requestId}/${providerId}?error=${encodeURIComponent(error.message)}`,
+      );
     }
   }
 
