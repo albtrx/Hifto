@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getUnreadCounts } from "@/lib/notifications";
+import { LiveBadge } from "@/components/live-badge";
 
 export async function MobileNav() {
   const supabase = await createClient();
@@ -15,17 +16,17 @@ export async function MobileNav() {
 
   const items = user
     ? [
-        { href: "/", label: "Start", icon: "🏠", badge: 0 },
-        { href: "/entdecken", label: "Aufträge", icon: "🔍", badge: 0 },
-        { href: "/anfrage/neu", label: "Neu", icon: "➕", badge: 0 },
-        { href: "/nachrichten", label: "Chat", icon: "💬", badge: messageCount },
-        { href: `/profil/${user.id}`, label: "Profil", icon: "👤", badge: 0 },
+        { href: "/", label: "Start", icon: "🏠", isChat: false },
+        { href: "/entdecken", label: "Aufträge", icon: "🔍", isChat: false },
+        { href: "/anfrage/neu", label: "Neu", icon: "➕", isChat: false },
+        { href: "/nachrichten", label: "Chat", icon: "💬", isChat: true },
+        { href: `/profil/${user.id}`, label: "Profil", icon: "👤", isChat: false },
       ]
     : [
-        { href: "/", label: "Start", icon: "🏠", badge: 0 },
-        { href: "/entdecken", label: "Aufträge", icon: "🔍", badge: 0 },
-        { href: "/anfrage/neu", label: "Neu", icon: "➕", badge: 0 },
-        { href: "/login", label: "Login", icon: "🔑", badge: 0 },
+        { href: "/", label: "Start", icon: "🏠", isChat: false },
+        { href: "/entdecken", label: "Aufträge", icon: "🔍", isChat: false },
+        { href: "/anfrage/neu", label: "Neu", icon: "➕", isChat: false },
+        { href: "/login", label: "Login", icon: "🔑", isChat: false },
       ];
 
   return (
@@ -38,10 +39,13 @@ export async function MobileNav() {
         >
           <span className="relative text-lg leading-none">
             {item.icon}
-            {item.badge > 0 && (
-              <span className="absolute -right-2 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
-                {item.badge}
-              </span>
+            {item.isChat && user && (
+              <LiveBadge
+                userId={user.id}
+                kind="message"
+                initialCount={messageCount}
+                className="absolute -right-2 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white"
+              />
             )}
           </span>
           {item.label}

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { logout } from "@/app/login/actions";
 import { getUnreadCounts } from "@/lib/notifications";
+import { LiveBadge } from "@/components/live-badge";
 
 export async function SiteHeader() {
   const supabase = await createClient();
@@ -48,11 +49,12 @@ export async function SiteHeader() {
               className="relative text-sm font-medium text-slate-600 hover:text-brand"
             >
               Nachrichten
-              {messageCount > 0 && (
-                <span className="absolute -right-3 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
-                  {messageCount}
-                </span>
-              )}
+              <LiveBadge
+                userId={user.id}
+                kind="message"
+                initialCount={messageCount}
+                className="absolute -right-3 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white"
+              />
             </Link>
           )}
         </nav>
@@ -66,11 +68,12 @@ export async function SiteHeader() {
                 aria-label="Benachrichtigungen"
               >
                 🔔
-                {bellCount > 0 && (
-                  <span className="absolute -right-1.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
-                    {bellCount}
-                  </span>
-                )}
+                <LiveBadge
+                  userId={user.id}
+                  kind="bell"
+                  initialCount={bellCount}
+                  className="absolute -right-1.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white"
+                />
               </Link>
               <Link
                 href={`/profil/${user.id}`}
