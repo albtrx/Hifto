@@ -67,6 +67,32 @@ export default async function MessagesPage() {
     }
   }
 
+  if (conversations.length > 0) {
+    const { data: latestMessages } = await supabase
+      .from("messages")
+      .select("request_id, body, created_at")
+      .in(
+        "request_id",
+        conversations.map((c) => c.requestId),
+      )
+      .order("created_at", { ascending: false });
+
+    const latestByRequest = new Map<string, { body: string; created_at: string }>();
+    for (const m of latestMessages ?? []) {
+      if (!latestByRequest.has(m.request_id)) {
+        latestByRequest.set(m.request_id, m);
+      }
+    }
+
+    for (const c of conversations) {
+      const latest = latestByRequest.get(c.requestId);
+      if (latest) {
+        c.preview = latest.body;
+        c.lastAt = latest.created_at;
+      }
+    }
+  }
+
   conversations.sort(
     (a, b) => new Date(b.lastAt).getTime() - new Date(a.lastAt).getTime(),
   );
